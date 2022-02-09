@@ -9,4 +9,7 @@ You better using unity 2020-version，because this Editor's Tool use 2020's Api,
 2:Download File From URL;  
 3:Upload File to HuaWei's cloud;  
 4:Upload File to QiNiu's cloud;  
+Other Example:HuaWei QiNiu And Download File  
+![image](https://github.com/YomiGame/Unity_Little_Editor/blob/main/fnc_2-4.png)    
 5:Excel's File trans to json's File, Json's FIle trans to Excel's File;  
+Down Open Your Excel's File When you Trans File  
