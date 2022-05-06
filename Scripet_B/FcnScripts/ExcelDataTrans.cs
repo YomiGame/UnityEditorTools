@@ -92,9 +92,11 @@ public class ExcelDataTrans
             for (int j = 0; j < colCount; j++) {
                 //读取第1行数据作为表头字段
                 string field = mSheet.Rows [0] [j].ToString ();
-                
-                //Key-Value对应
-                row [field] = mSheet.Rows [i] [j];
+                if (field != "")
+                {
+                    //Key-Value对应
+                    row[field] = mSheet.Rows[i][j];
+                }
             }
 
             
@@ -116,12 +118,14 @@ public class ExcelDataTrans
             }
         }*/
     }
-        
+
+    
+
     ///////////////////////////////////////////////////////////////////
     
      
     ///////////////////////////////////////////////////////////////////
-    public ArrayList JsonToDataSet(string JsonUrl)
+    public List<List<string>> JsonToDataSet(string JsonUrl)
     {
 
         StreamReader sr = new StreamReader(JsonUrl, Encoding.UTF8);
@@ -135,16 +139,16 @@ public class ExcelDataTrans
         
     }
     
-    private  ArrayList ConvertToDesiredType(object list)
+    private  List<List<string>> ConvertToDesiredType(object list)
     {
-        ArrayList DataList = new ArrayList();
+        List<List<string>> DataList = new  List<List<string>>();
         int Index = 0;
-        foreach (var item in (IEnumerable<dynamic>)list)
+        foreach (var item in (IEnumerable<object>)list)
         {
             if (Index == 0)
             {
                 List<string> KeyList = new List<string>();
-                foreach (JProperty datas in item)  
+                foreach (JProperty datas in (IEnumerable<object>)item)  
                 {  
                     KeyList.Add(datas.Name);
                 }
@@ -154,25 +158,25 @@ public class ExcelDataTrans
 
             Index++;
             List<string> ItemList = new List<string>();
-            foreach (JProperty datas in item)  
+            foreach (JProperty datas in (IEnumerable<object>)item)  
             {
                 ItemList.Add((string)datas.Value);
             }
-            Debug.Log(ItemList.Count);
             DataList.Add(ItemList);
 
         }
-        Debug.Log(" DateLine>> "+DataList.Count+" DataRow>> "+Index);
+        Debug.Log(" DateLine>> "+DataList.Count);
+
+        
         return DataList;
     }
 
-    public void ArrayWriteToExcel(ArrayList JsonOutData,string fileUrl,int sheetIndex)
+    public void ArrayWriteToExcel(List<List<string>> JsonOutData,string fileUrl,int sheetIndex)
     {
         FileInfo _excelName = new FileInfo(fileUrl);
         ExcelPackage package = new ExcelPackage(_excelName);
 
-        ExcelWorksheet worksheet = package.Workbook.Worksheets[sheetIndex];
-        Debug.Log(worksheet);
+        ExcelWorksheet worksheet = package.Workbook.Worksheets["CloudData"];
         if (worksheet == null)
         {
             worksheet = package.Workbook.Worksheets.Add("CloudData");
@@ -192,6 +196,7 @@ public class ExcelDataTrans
         
         //保存excel
         package.Save();
+        Debug.Log("FileSaveSuccess");
     }
 
 
