@@ -14,5 +14,5 @@ Other Example:HuaWei QiNiu And Download File
 5:Excel's File trans to json's File, Json's FIle trans to Excel's File;  
 Down Open Your Excel's File When you Trans File  
 ![image](https://github.com/YomiGame/Unity_Little_Editor/blob/main/fnc_6.png)    
-6:Add a little Json's Editor, it can Trans Json, Show Json's data and Save,it just have a easy read write show function;  
-it will be add some other by my idea,but its not now;  
+6:Add a little Json's Editor, it can Trans Json, Show Json's data and Save And Change Json's data    
+And it have other function, it can be use just like using Excel Editor easily.    
