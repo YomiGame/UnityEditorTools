@@ -320,7 +320,6 @@ public class JsonEditTool : EditorWindow
                     tableJsonList[i][j] = EditorGUILayout.TextField("");
                 }
 
-                Debug.Log(tableJsonList.Count);
             }
 
             EditorGUILayout.EndHorizontal();
@@ -330,13 +329,13 @@ public class JsonEditTool : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
-    private void ContentCreate(string num, int raw, int line)
+    private void ContentCreate(string num, int line, int raw)
     {
         if (EditorGUILayout.DropdownButton(new GUIContent(num), FocusType.Keyboard, GUILayout.Width(100)))
         {
             EnumSelectRaw = raw;
             EnumSelectLine = line;
-            string[] alls = new string[2] {"AddInsert", "CopyInsert"};
+            string[] alls = new string[4] {"AddInsert", "CopyInsert","AddTableRaw","AddTableLine"};
             GenericMenu menu = new GenericMenu();
             int HandleIndex = 0;
             foreach (var item in alls)
@@ -366,13 +365,13 @@ public class JsonEditTool : EditorWindow
                 Tips.GTI().CB = () =>
                 {
                     int tempNum = 0;
-                    for (int i = 1; i < tableJsonList.Count - EnumSelectRaw; i++)
+                    for (int i = 1; i < tableJsonList.Count - EnumSelectLine; i++)
                     {
                         if (Tips.GTI().EnumAddNum > tempNum)
                         {
                             tempNum++;
-                            tableJsonList[EnumSelectRaw + i][EnumSelectLine] =
-                                (Convert.ToInt32(tableJsonList[EnumSelectRaw + i - 1][EnumSelectLine]) + 1).ToString();
+                            tableJsonList[EnumSelectLine + i][EnumSelectRaw] =
+                                (Convert.ToInt32(tableJsonList[EnumSelectLine + i - 1][EnumSelectRaw]) + 1).ToString();
                         }
 
                     }
@@ -384,18 +383,24 @@ public class JsonEditTool : EditorWindow
                 Tips.GTI().CB = () =>
                 {
                     int tempNum = 0;
-                    for (int i = 1; i < tableJsonList.Count - EnumSelectRaw; i++)
+                    for (int i = 1; i < tableJsonList.Count - EnumSelectLine; i++)
                     {
                         if (Tips.GTI().EnumAddNum > tempNum)
                         {
                             tempNum++;
-                            tableJsonList[EnumSelectRaw + i][EnumSelectLine] =
-                                tableJsonList[EnumSelectRaw + i - 1][EnumSelectLine];
+                            tableJsonList[EnumSelectLine + i][EnumSelectRaw] =
+                                tableJsonList[EnumSelectLine + i - 1][EnumSelectRaw];
                         }
 
                     }
                 };
                 Tips.GTI().Show();
+                break;
+            case 2:
+                ChooseAddRaw(EnumSelectRaw);
+                break;
+            case 3:
+                ChooseAddLine(EnumSelectLine);
                 break;
         }
     }
@@ -478,6 +483,50 @@ public class JsonEditTool : EditorWindow
             }
         }
     }
+    private void ChooseAddRaw(int RawIndex)
+    {
+        List<string[]> tempJL = new List<string[]>();
+        for (int i = 0; i < tableJsonList.Count; i++)
+        {
+            string[] tempStrArray = new string[tableJsonList[0].Length + 1];
+            Debug.Log(tempStrArray.Length);
+            for (int j = 0; j <= tableJsonList[0].Length; j++)
+            {
+                if (j < RawIndex)
+                {
+                    if (tableJsonList[i][j] != null)
+                    {
+                        tempStrArray[j] = tableJsonList[i][j].ToString();
+                    }
+                    else
+                    {
+                        tempStrArray[j] = "";
+                    }
+                }
+                else if(j == RawIndex)
+                {
+                    tempStrArray[j] = "";
+                }else
+                {
+                    if (tableJsonList[i][j-1] != null)
+                    {
+                        tempStrArray[j] = tableJsonList[i][j-1].ToString();
+                    }
+                    else
+                    {
+                        tempStrArray[j] = "";
+                    }
+                }
+            }
+
+            tempJL.Add(tempStrArray);
+
+            if (i == tableJsonList.Count - 1)
+            {
+                tableJsonList = tempJL;
+            }
+        }
+    }
 
     private void AddLine()
     {
@@ -489,6 +538,16 @@ public class JsonEditTool : EditorWindow
 
         tableJsonList.Add(td);
     }
+    private void ChooseAddLine(int lineIndex)
+    {
+        string[] td = new string[tableJsonList.Count];
+        for (int i = 0; i < tableJsonList.Count - 1; i++)
+        {
+            td[i] = "";
+        }
+        tableJsonList.Insert(lineIndex,td);
+    }
+    
 
     private void SaveDataAndWriteToJson(string JsonPath)
     {
