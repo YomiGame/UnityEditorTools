@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using UnityEngine;
 using Encoding = System.Text.UTF8Encoding;
 namespace qiniu
 {
@@ -68,7 +69,7 @@ namespace qiniu
 				}
 				catch (Exception e)
 				{
-					//throw e;
+					Debug.Log(e.Message);
 				}
 			}
 		}

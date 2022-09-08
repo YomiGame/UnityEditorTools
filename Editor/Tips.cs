@@ -14,9 +14,14 @@ public class Tips : EditorWindow
     /// <summary>
     /// EnumADDNum
     /// </summary>
+    private bool isRaw = false;
+    private bool isLine = false;
+
+    public bool IsRaw => isRaw;
+    public bool IsLine => isLine;
+    
     private string enumAddNum;
     public int EnumAddNum => Convert.ToInt32(enumAddNum);
-
     private string rawNum;
     public int RawNum => Convert.ToInt32(rawNum);
 
@@ -88,12 +93,13 @@ public class Tips : EditorWindow
                 }
                 break;
             case 3:
-                rawNum = EditorGUILayout.TextField("RawAddNum", rawNum);
-                lineNum = EditorGUILayout.TextField("LineAddNum", lineNum);
+
+                isRaw = EditorGUILayout.Toggle("RawAddNum", isRaw);
+                isLine = EditorGUILayout.Toggle("LineAddNum", isLine);
                 if (EditorGUILayout.DropdownButton(new GUIContent("RawLineAdd"), FocusType.Keyboard))
                 {
                     _cb.Invoke();
-                    Tips.GTI().Close();
+                    //Tips.GTI().Close();
                 }
                 break;
             case 4:

@@ -9,8 +9,8 @@ public class ExcelTransTool : EditorWindow
     
     private bool groupEnabled_1;
     private bool groupEnabled_2;
-    private ArrayList jsonArrayList = new ArrayList();
-[MenuItem("DesignTools/Data/ExcelTransTool")]
+    private List<List<string>> jsonArrayList = new List<List<string>>();
+    [MenuItem("DesignTools/Data/ExcelTransTool")]
     static void Init()
     {
         //弹出窗口

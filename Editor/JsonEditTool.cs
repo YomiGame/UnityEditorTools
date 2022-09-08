@@ -32,8 +32,18 @@ public class JsonEditTool : EditorWindow
     private int EnumSelectRaw;
     private int EnumSelectLine;
 
+    private string SaveFilePath;
 
+    /// <summary>
+    /// History Url
+    /// </summary>
 
+    private List<string> H_StringArray;
+    private List<string> ShowHUStringArray;
+
+    private bool HUIsCanAdd;
+
+    private string ReadFileUrl;
     [MenuItem("DesignTools/Data/JsonEditTool")]
     static void Init()
     {
@@ -45,6 +55,8 @@ public class JsonEditTool : EditorWindow
     private void OnEnable()
     {
         BeginRefresh = false;
+        SaveFilePath = Application.dataPath;
+        ReadFileUrl = Application.dataPath;
     }
 
     private void OnDisable()
@@ -57,7 +69,7 @@ public class JsonEditTool : EditorWindow
         EditorGUILayout.Space();
         EditorGUILayout.BeginHorizontal();
 
-        if (EditorGUILayout.DropdownButton(new GUIContent("File"), FocusType.Keyboard, GUILayout.Width(50)))
+        if (EditorGUILayout.DropdownButton(new GUIContent("File"), FocusType.Keyboard, GUILayout.Width(100)))
         {
             string[] alls = new string[5]
             {
@@ -120,7 +132,7 @@ public class JsonEditTool : EditorWindow
             menu.ShowAsContext();
         }
 
-        if (EditorGUILayout.DropdownButton(new GUIContent("Edit"), FocusType.Keyboard, GUILayout.Width(50)))
+        if (EditorGUILayout.DropdownButton(new GUIContent("Edit"), FocusType.Keyboard, GUILayout.Width(100)))
         {
             string[] alls = new string[2] {"AddLineOrAddRaw", "CreateTable"};
             GenericMenu menu = new GenericMenu();
@@ -156,7 +168,51 @@ public class JsonEditTool : EditorWindow
 
             menu.ShowAsContext();
         }
+        if (EditorGUILayout.DropdownButton(new GUIContent("History"), FocusType.Keyboard, GUILayout.Width(100)))
+        {
+            if (H_StringArray == null)
+            {
+                H_StringArray = new List<string>();
+                H_StringArray.Add("AddHistoryUrl");
+                H_StringArray.Add("ClearHistoryUrl");
+               
+            }
+            if (ShowHUStringArray == null)
+            {
+                ShowHUStringArray = new List<string>();
+                ShowHUStringArray.Add("AddHistoryUrl");
+                ShowHUStringArray.Add("ClearHistoryUrl");
+               
+            }
 
+            
+
+            GenericMenu menu = new GenericMenu();
+            int HandleIndex = 0;
+            foreach (var item in ShowHUStringArray)
+            {
+                if (string.IsNullOrEmpty(item))
+                {
+                    continue;
+                }
+                menu.AddItem(new GUIContent(item), false, FileUrlEditor, HandleIndex);
+                /*switch (HandleIndex)
+                {
+                    case 0:
+                        
+                        menu.AddItem(new GUIContent(item), false, EditEditor, HandleIndex);
+                        break;
+                    default:
+                        menu.AddItem(new GUIContent(item), false, FileUrlEditor, HandleIndex);
+                        break;
+                }*/
+                //添加菜单
+
+                HandleIndex++;
+            }
+
+            menu.ShowAsContext();
+        }
         EditorGUILayout.EndHorizontal();
         if (IsAutoSave)
         {
@@ -198,8 +254,8 @@ public class JsonEditTool : EditorWindow
         switch (Convert.ToInt32(index))
         {
             case 0:
-                jsonList = ExcelDataTrans.DataTransIns()
-                    .JsonToDataSet(EditorUtility.OpenFilePanel("Choose Json File", Application.dataPath, "json"));
+                ReadFileUrl = EditorUtility.OpenFilePanel("Choose Json File", Application.dataPath, "json");
+                jsonList = ExcelDataTrans.DataTransIns().JsonToDataSet(ReadFileUrl);
                 ReadFileData(jsonList);
                 BeginRefresh = true;
                 break;
@@ -210,13 +266,13 @@ public class JsonEditTool : EditorWindow
 
                 break;
             case 2:
-                SaveDataAndWriteToJson(EditorUtility.OpenFilePanel("Choose Json File", Application.dataPath, "json"));
+                SaveDataAndWriteToJson(EditorUtility.OpenFilePanel("Choose Json File", SaveFilePath, "json"));
                 break;
             case 3:
                 IsAutoSave = !IsAutoSave;
                 if (IsAutoSave)
                 {
-                    AutoSaveFileUrl = EditorUtility.OpenFilePanel("Choose Json File", Application.dataPath, "json");
+                    AutoSaveFileUrl = EditorUtility.OpenFilePanel("Choose Json File", SaveFilePath, "json");
                 }
 
                 break;
@@ -240,12 +296,14 @@ public class JsonEditTool : EditorWindow
                 Tips.GTI().ShowIndex = 3;
                 Tips.GTI().CB = () =>
                 {
-                    if (Tips.GTI().RawNum > 0)
+                    Debug.Log(Tips.GTI().IsRaw);
+                    Debug.Log(Tips.GTI().IsLine);
+                    if (Tips.GTI().IsRaw)
                     {
                         AddRaw();
                     }
 
-                    if (Tips.GTI().LineNum > 0)
+                    if (Tips.GTI().IsLine)
                     {
                         AddLine();
                     }
@@ -267,6 +325,45 @@ public class JsonEditTool : EditorWindow
                 Tips.GTI().Show();
                 break;
             case 2:
+                break;
+
+        }
+    }
+
+
+    private void FileUrlEditor(object index)
+    {
+        switch (Convert.ToInt32(index))
+        {
+                
+            case 0:
+                HUIsCanAdd = true;
+                for (int i = 0; i < H_StringArray.Count; i++)
+                {
+                    if (ReadFileUrl == H_StringArray[i])
+                    {
+                        HUIsCanAdd = false;
+                    }
+
+                    if (i >= H_StringArray.Count - 1&&HUIsCanAdd)
+                    {
+                        H_StringArray.Add(ReadFileUrl);
+                        Debug.Log(ReadFileUrl.Length);
+                        Debug.Log(ReadFileUrl.LastIndexOf("/") + 1);
+                        Debug.Log(ReadFileUrl.Length - ReadFileUrl.LastIndexOf('/'));
+                        string tempstring = ReadFileUrl.Substring(ReadFileUrl.LastIndexOf('/') + 1, ReadFileUrl.Length - ReadFileUrl.LastIndexOf('/')-1);
+                        ShowHUStringArray.Add(tempstring);
+                    }
+                }
+                
+                break;
+            case 1:
+                H_StringArray = null;
+                ShowHUStringArray = null;
+                break;
+            default:
+                jsonList = ExcelDataTrans.DataTransIns().JsonToDataSet(H_StringArray[Convert.ToInt32(index)]);
+                ReadFileData(jsonList);
                 break;
 
         }
@@ -335,7 +432,7 @@ public class JsonEditTool : EditorWindow
         {
             EnumSelectRaw = raw;
             EnumSelectLine = line;
-            string[] alls = new string[4] {"AddInsert", "CopyInsert","AddTableRaw","AddTableLine"};
+            string[] alls = new string[6] {"AddInsert", "CopyInsert","AddTableRaw","AddTableLine","DelTableRaw","DelTableLine"};
             GenericMenu menu = new GenericMenu();
             int HandleIndex = 0;
             foreach (var item in alls)
@@ -401,6 +498,12 @@ public class JsonEditTool : EditorWindow
                 break;
             case 3:
                 ChooseAddLine(EnumSelectLine);
+                break;
+            case 4:
+                ChooseDelRaw(EnumSelectRaw);
+                break;
+            case 5:
+                ChooseDelLine(EnumSelectLine);
                 break;
         }
     }
@@ -528,10 +631,52 @@ public class JsonEditTool : EditorWindow
         }
     }
 
+    private void ChooseDelRaw(int RawIndex)
+    {
+        List<string[]> tempJL = new List<string[]>();
+        for (int i = 0; i < tableJsonList.Count; i++)
+        {
+            string[] tempStrArray = new string[tableJsonList[0].Length-1];
+
+            for (int j = 0; j <= tableJsonList[0].Length; j++)
+            {
+                if (j < RawIndex)
+                {
+                    if (tableJsonList[i][j] != null)
+                    {
+                        tempStrArray[j] = tableJsonList[i][j].ToString();
+                    }
+                    else
+                    {
+                        tempStrArray[j] = "";
+                    }
+                }
+                else if(j >= RawIndex&&j+1 < tableJsonList[i].Length)
+                {
+                    if (tableJsonList[i][j+1] != null)
+                    {
+                        tempStrArray[j] = tableJsonList[i][j-1].ToString();
+                    }
+                    else
+                    {
+                        tempStrArray[j] = "";
+                    }
+                }
+            }
+
+            tempJL.Add(tempStrArray);
+
+            if (i == tableJsonList.Count - 1)
+            {
+                tableJsonList = tempJL;
+            }
+        }
+    }
+
     private void AddLine()
     {
         string[] td = new string[tableJsonList.Count];
-        for (int i = 0; i < tableJsonList.Count - 1; i++)
+        for (int i = 0; i < tableJsonList[0].Length - 1; i++)
         {
             td[i] = "";
         }
@@ -541,13 +686,16 @@ public class JsonEditTool : EditorWindow
     private void ChooseAddLine(int lineIndex)
     {
         string[] td = new string[tableJsonList.Count];
-        for (int i = 0; i < tableJsonList.Count - 1; i++)
+        for (int i = 0; i < tableJsonList[0].Length - 1; i++)
         {
             td[i] = "";
         }
         tableJsonList.Insert(lineIndex,td);
     }
-    
+    private void ChooseDelLine(int lineIndex)
+    {
+        tableJsonList.RemoveAt(lineIndex);
+    }
 
     private void SaveDataAndWriteToJson(string JsonPath)
     {
@@ -584,6 +732,7 @@ public class JsonEditTool : EditorWindow
         //生成Json字符串
         string json = JsonConvert.SerializeObject(table, Newtonsoft.Json.Formatting.Indented);
         DataTrans.DataTransIns().JsonWriteToFile(json, JsonPath);
+        SaveFilePath = System.IO.Path.GetDirectoryName(JsonPath);
     }
 
     ////////////CreateDefaultTable
