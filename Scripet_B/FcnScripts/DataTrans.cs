@@ -45,7 +45,7 @@ public class DataTrans
     public void JsonDataSaveToFile(string data,string filePath)
     {
         string jsonData;
-        jsonData  = JsonMapper.ToJson(data);
+        jsonData = data;//JsonMapper.ToJson(data);
         Debug.Log(jsonData);
         File.WriteAllText(filePath, jsonData);
         Debug.Log("保存成功");
@@ -58,7 +58,7 @@ public class DataTrans
     public void JsonDataSaveToFile(string data,string filePath,bool isShowFileFold)
     {
         string jsonData;
-        jsonData  = JsonMapper.ToJson(data);
+        jsonData = data;//JsonMapper.ToJson(data);
         Debug.Log(jsonData);
         File.WriteAllText(filePath, jsonData);
         Debug.Log("保存成功");
